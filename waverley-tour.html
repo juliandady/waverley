@@ -1,0 +1,381 @@
+<title>Waverley Cemetery Walk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Waverley">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-column pocket guide. Route map + stop list at home; each stop is a full screen with a docked player at the bottom. */
+:root{
+  --bg:#eef1f1; --surface:#ffffff; --ink:#13232b; --muted:#5b6b72; --line:#d3dcdf;
+  --sea:#0e6e85; --sea-soft:#d6e9ee; --stone:#a8692f; --stone-soft:#f1e3d4; --done:#2f7d55;
+  --display:"Cinzel","Trajan Pro",Georgia,serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b161b; --surface:#12222a; --ink:#e4ecee; --muted:#93a6ad; --line:#24363e;
+  --sea:#5cb8cf; --sea-soft:#14323c; --stone:#e0a066; --stone-soft:#33261b; --done:#6cc493; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b161b; --surface:#12222a; --ink:#e4ecee; --muted:#93a6ad; --line:#24363e;
+  --sea:#5cb8cf; --sea-soft:#14323c; --stone:#e0a066; --stone-soft:#33261b; --done:#6cc493; color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 140px}
+h1,h2{font-family:var(--display);font-weight:700;letter-spacing:.04em;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,8vw,40px);line-height:1.1}
+h2{font-size:24px;line-height:1.2}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.btn{border:0;border-radius:999px;padding:12px 20px;font-weight:600;background:var(--sea);color:var(--surface)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* home */
+.hero{display:flex;flex-direction:column;gap:10px;padding-block:8px 4px}
+.hero p{margin:0;color:var(--muted);max-width:60ch}
+.facts{display:flex;gap:18px;flex-wrap:wrap}
+.facts div{display:flex;flex-direction:column}
+.facts b{font-family:var(--mono);font-size:20px;font-weight:500}
+.facts span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.map{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.map svg{display:block;width:100%;height:auto}
+.mapfoot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.list li{border-bottom:1px solid var(--line)}
+.list button{width:100%;display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;background:none;border:0;padding:12px 2px;text-align:left}
+.num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:13px;border:1.5px solid var(--stone);color:var(--stone)}
+.done .num{background:var(--done);border-color:var(--done);color:var(--surface)}
+.list .t{font-weight:600;min-width:0}
+.list .s{font-size:13px;color:var(--muted)}
+.list .d{font-size:12px;color:var(--muted)}
+.note{background:var(--stone-soft);border-radius:12px;padding:14px 16px;font-size:14px}
+.note b{display:block;margin-bottom:4px}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}
+
+/* stop */
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.back{background:none;border:0;padding:8px 0;color:var(--muted);font-size:14px}
+.prog{display:flex;gap:3px;flex:1;max-width:220px}
+.prog i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.prog i.on{background:var(--sea)}.prog i.v{background:var(--done)}
+.stophead{display:flex;flex-direction:column;gap:6px;padding-top:6px}
+.years{font-family:var(--mono);color:var(--stone);font-size:14px}
+.look{background:var(--sea-soft);border-radius:12px;padding:12px 16px;font-size:15px}
+.look .eyebrow{color:var(--sea);margin-bottom:2px}
+.dist{font-size:13px;color:var(--muted)}
+.script p{margin:0 0 14px;font-size:17px;line-height:1.65;max-width:62ch}
+.script span{transition:background .2s,color .2s;border-radius:3px}
+.script span.now{background:var(--sea-soft);color:var(--ink);box-shadow:0 0 0 2px var(--sea-soft)}
+.fact{border-left:3px solid var(--stone);padding:4px 0 4px 14px;font-size:15px}
+.fact .eyebrow{color:var(--stone)}
+
+/* player */
+.player{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));z-index:5}
+.pin{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--sea);width:0;transition:width .3s}
+.ctrls{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:10px;align-items:center}
+.ic{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.ic:disabled{opacity:.35;cursor:default}
+.play{width:56px;height:56px;border-radius:50%;border:0;background:var(--sea);color:var(--surface);display:grid;place-items:center}
+.ic svg,.play svg{width:20px;height:20px;fill:currentColor}
+.meta{min-width:0;font-size:13px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.meta b{color:var(--ink);font-weight:600}
+.speed{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;font-family:var(--mono);font-size:13px}
+.voicewarn{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app"></div>
+
+<script>
+const STOPS=[
+{n:1,title:"Welcome to Waverley",sub:"Start of the walk",lat:-33.9073192,lng:151.2643147,
+look:"Before you go in, turn and face the ocean. Few cemeteries anywhere sit this close to a cliff edge.",
+script:[
+"Welcome to Waverley Cemetery. You're standing on the clifftop between Bronte and Clovelly, and you've probably already worked out why people call this one of the most beautiful cemeteries in the world.",
+"This land belongs to the Bidjigal, Birrabirragal and Gadigal people, who lived along this coast for thousands of years before anyone drew a grid of graves across it.",
+"The cemetery opened in the 1870s. Since then it has filled up with poets, rock stars, rebels, inventors, a Titanic survivor and one small boy whose story turned out to be completely wrong for more than a century.",
+"The walk takes about half an hour. Take it slowly, stick to the paths, and keep your voice down if you pass anyone visiting a grave. People still come here to grieve.",
+"When you're ready, tap next and we'll start with how this place came to be."],
+fact:"The Hello Bondi walk this tour follows originally began as the opening leg of Bondi Festival's coastal walk, which ran all the way to Bondi Pavilion."},
+{n:2,title:"History of the cemetery",sub:"Over 100,000 burials",lat:-33.9072399,lng:151.2641923,
+look:"The front gates. They're a memorial to Waverley locals who died in the two World Wars.",
+script:[
+"Waverley began in 1875 with ten acres of land. The first burial came in 1877: a woman called Ruth Allen, who was eighty-five.",
+"It was laid out like a grand city cemetery, in a grid running north to south, with people separated by religion. That's why you'll notice distinct Catholic, Anglican and other sections as you walk.",
+"Today more than a hundred thousand people rest here. Over two hundred are war graves, and at least eleven belong to veterans of the American Civil War, which is not something you expect to find in Bronte.",
+"The ground is old and tight enough that many graves are still dug by hand.",
+"It's also a film set. Baywatch, Home and Away, Water Rats and a Bollywood hit have all shot here.",
+"Keep an eye out for a granite tomb with a pointed pyramid roof at a path junction. It was designed by Walter Burley Griffin and Marion Mahony Griffin, the architects who won the competition to design Canberra."],
+fact:"Waverley was added to the NSW State Heritage Register in 2016."},
+{n:3,title:"Henry Lawson",sub:"Writer and poet",years:"1867–1922",lat:-33.9079538,lng:151.2652409,
+look:"Lawson's grave. He's the first of several writers buried in this part of the cemetery.",
+script:[
+"Henry Lawson is often called Australia's greatest short story writer. He was born in a tent on a goldfield, and an ear infection left him almost completely deaf by fourteen.",
+"In 1892 the editor of The Bulletin magazine, J. F. Archibald, who you'll meet a few stops on, gave him a train ticket to Bourke and five pounds, and told him to go and find stories.",
+"Lawson spent six months in the outback during a drought. What he saw was heat, flies, poverty and loneliness, and he wrote it down exactly like that.",
+"That put him in direct contrast to Banjo Paterson, who made the bush sound heroic and romantic. The two of them argued about it publicly in verse.",
+"Lawson's short, stripped-back sentences more or less invented realistic Australian writing. The Drover's Wife, about a woman alone in the bush with her kids and a snake, is still taught in schools.",
+"His later life was hard: alcoholism, mental illness, time in Darlinghurst Gaol. But when he died in 1922 he became the first Australian writer given a state funeral. Two prime ministers attended, and crowds lined the route all the way from the city to this cliff."],
+fact:"His first published poem, in 1887, was called A Song of the Republic."},
+{n:4,title:"Wee Davie",sub:"The 'orphan' who wasn't",years:"1875–1878",lat:-33.9081059,lng:151.2647871,
+look:"A small headstone with the inscription 'Somebody's darling is buried here'.",
+script:[
+"This is one of the strangest stories in the cemetery, and it has a twist.",
+"For over a hundred years, the story went like this. In 1878 a little boy was killed by a butcher's horse and cart. Nobody came forward to claim him. The cart driver felt so guilty that he paid for the funeral himself, made up the name Wee Davie, and had the headstone read 'Somebody's darling is buried here'.",
+"He was the first person buried in the Catholic section. It's a sad, beautiful story, and it was told for generations.",
+"Then in 2020, a volunteer from the Friends of Waverley Cemeteries found a letter to The Bulletin, written in 1917. The writer said, more or less: nice story, but it's fiction. Wee Davie was my three-year-old son.",
+"His name was Davie Herbert Ford. He died of diphtheria, not a cart accident, and his father Joseph had paid for the grave because he was his dad.",
+"So the 'kind stranger' in the legend was actually a grieving father. It's a good reminder that a story being repeated a lot doesn't make it true."],
+fact:"In the letter, the father said he hoped to be buried beside his son one day."},
+{n:5,title:"Malcolm Young",sub:"AC/DC",years:"1953–2017",lat:-33.9086990,lng:151.2657049,
+look:"Guitar picks, flowers and photos left by fans. This grave is a pilgrimage site.",
+script:[
+"Malcolm Young was born in Glasgow. His family left Scotland during the brutal winter of 1963 after seeing an ad offering assisted passage to Australia, and they started out in the Villawood migrant hostel before moving to Burwood.",
+"Music ran through the whole family. The older brothers played first, and the guitars got handed down until they reached Malcolm and his younger brother Angus.",
+"In 1973 the two of them formed AC/DC. They took the name from the back of their sister Margaret's sewing machine.",
+"Angus was the one in the school uniform. Malcolm stood further back on rhythm guitar, and Angus called him the band's foundation. He used unusually heavy strings and had a knack for knowing exactly when not to play.",
+"After singer Bon Scott died in 1980, the band released Back in Black with an all-black cover in his memory. It sold an estimated fifty million copies and is one of the best-selling albums ever made.",
+"Malcolm co-wrote Highway to Hell, Back in Black and You Shook Me All Night Long. He was inducted into the Rock and Roll Hall of Fame in 2003, played his last live show in 2010 after a cancer diagnosis, and retired from the band in 2014. He died in 2017."],
+fact:"Tributes at his funeral came from Metallica, Guns N' Roses, Foo Fighters, Ozzy Osbourne and Eddie Van Halen, among many others."},
+{n:6,title:"The O'Brien family",sub:"The family that owned Bondi",lat:-33.9097460,lng:151.2664231,
+look:"The O'Brien family vault, which faces the sea.",
+script:[
+"Bondi used to belong to one family. Literally all of it, beach included.",
+"The first land grant there went to a former convict and road builder, William Roberts, in 1809. He ran cattle on it.",
+"In 1851 a newspaper owner called Edward Smith Hall bought the lot for three hundred pounds, in trust for his daughter Georgiana. Georgiana was married to Francis O'Brien, who had earlier been married to her sister.",
+"They tried to subdivide and sell it, but nobody bit. Back then Bondi was huge sand dunes with no public transport, and it was considered far too far from town.",
+"So O'Brien kept it, named it the O'Brien Estate and built a homestead with gardens and a farm. He married three times and raised eleven children there. There were freshwater lagoons covered in water lilies, and two of his young daughters drowned in one of them.",
+"The family built their own mausoleum in Bondi. In 1928 it was demolished, and the seventeen or more bodies inside were moved here."],
+fact:"O'Brien sold the estate off slowly until his death in 1896. Georgiana Street, named after his wife, is now Wellington Street."},
+{n:7,title:"J. F. Archibald",sub:"Editor and benefactor",years:"1856–1919",lat:-33.9099100,lng:151.2661448,
+look:"Archibald's grave, close to the O'Brien vault.",
+script:[
+"If you've heard of the Archibald Prize, Australia's best-known portrait award, this is the man it's named after.",
+"He was born John Feltham Archibald, but he was so obsessed with France that he changed his name to Jules François.",
+"In 1880 he co-founded The Bulletin, which became the place for Australian poets, cartoonists and storytellers. He's the editor who sent Henry Lawson to Bourke with a train ticket and five pounds.",
+"The Bulletin was hugely influential in politics too. It was radical and republican, and also openly racist, pushing hard for keeping non-white immigrants out. That's part of the record too.",
+"Archibald had a complete breakdown in the early 1900s and spent years in a psychiatric hospital. He never fully recovered, and died in 1919.",
+"Besides the art prize, he left Sydney the Archibald Fountain in Hyde Park."],
+fact:"The Bulletin kept going in one form or another until it finally closed in 2008."},
+{n:8,title:"Evelyn Marsden",sub:"Titanic survivor",years:"1883–1938",lat:-33.9101582,lng:151.2667335,
+look:"Her memorial marker, which was only added in 2000. For sixty-two years this grave had no headstone.",
+script:[
+"Evelyn Marsden grew up in South Australia, where she learned to ride and to row on holidays at Murray Bridge. That second skill ended up saving her life.",
+"She trained as a nurse, sailed to England and got work as a stewardess on the White Star Line's huge new liners.",
+"In 1911 she was on the Olympic when it collided with a navy cruiser. The crew were then moved across to the Olympic's sister ship, the one everyone called unsinkable: Titanic.",
+"On the night of the fourteenth of April 1912, Titanic hit an iceberg. Evelyn got a place in lifeboat sixteen, and she rowed for hours in the freezing dark to keep the boat clear of the sinking ship.",
+"Of more than two thousand people on board, only about seven hundred survived. She was one of just two Australians who did.",
+"She married a ship's doctor, came home to a celebrity welcome in Adelaide, and eventually settled in Curlewis Street, Bondi. She died in 1938, and her husband died a week later. They were buried here without a headstone, and stayed that way until a magazine article in 2000 led people to raise money for a marker."],
+fact:"It wasn't her first shipping accident. The Olympic collision happened only seven months before Titanic."},
+{n:9,title:"The Irish Monument",sub:"1798 Rebellion and Michael Dwyer",years:"1772–1825",lat:-33.9090554,lng:151.2665508,
+look:"The biggest monument in the cemetery: white marble, a nine-metre carved cross, and an inscription in Ogham, the ancient Irish script.",
+script:[
+"You can't miss this one. It's the largest monument in Waverley Cemetery, and the largest memorial to the 1798 Irish Rebellion anywhere in the world, including Ireland.",
+"It's built from white Carrara marble, the same Italian stone Michelangelo used, and it took from 1898 to 1901 to build. Check the floor for mosaics of thatched cottages and Irish round towers.",
+"Inside lie the remains of Michael Dwyer, the Wicklow Chief, a rebel leader who fought the British in the Wicklow mountains.",
+"He was eventually transported to Sydney as a political prisoner, but was freed on arrival. He died in 1825 and was originally buried at the old Devonshire Street cemetery, where Central Station is now.",
+"In 1898, for the centenary of the rebellion, he and his wife Mary were dug up and moved here. Around a hundred thousand people followed the procession. It was the biggest 1798 centenary event in the world.",
+"The Ogham inscription says the bright days of ancient Ireland will dawn once more."],
+fact:"Irish president Mary McAleese gave an address here in 1998, for the rebellion's bicentenary."},
+{n:10,title:"Lawrence Hargrave",sub:"Aviation pioneer",years:"1850–1915",lat:-33.9088532,lng:151.2668893,
+look:"Hargrave's grave. He was on the back of Australia's old paper twenty-dollar note.",
+script:[
+"Lawrence Hargrave helped prove humans could fly, and he did it with box kites.",
+"In 1894, nearly a decade before the Wright brothers, he strapped four box kites together with a seat and lifted himself almost five metres off the beach near Stanwell Park, south of Sydney.",
+"His big discovery was that a three-dimensional box kite was far more stable than a flat one. That design spread through other inventors, and ideas descended from it ended up in the Wright brothers' plane.",
+"He also built a rotary engine in 1889 that became a model for the engines that powered early aircraft.",
+"Before all that, he'd been an explorer on expeditions to New Guinea, and worked at Sydney Observatory, where he built his own adding machines to help with the calculations.",
+"He never patented his ideas, because he wanted anyone to be able to use them. His only son, Geoffrey, was killed at Gallipoli in 1915, and Hargrave died just weeks later."],
+fact:"He was inspired by how animals move, and wrote about the link between walking, swimming and flying."},
+{n:11,title:"Henry Kendall",sub:"Poet",years:"1839–1882",lat:-33.9076746,lng:151.2668733,
+look:"Kendall's large, imposing grave.",
+script:[
+"Henry Kendall was the first of the big-name Australian writers to end up at Waverley. Lawson, Archibald and Mackellar all came after him.",
+"He was born near Ulladulla on the south coast, lost his father at thirteen, and then spent two years at sea on his uncle's whaling boat.",
+"Back in Sydney he worked as a clerk and sent poems off to newspapers. His best-known one, Bell Birds, was learned by generations of Australian kids for the way it sounds like the bush.",
+"His life went badly off the rails. He drank heavily, ended up broke, and was committed to an asylum for four months.",
+"He recovered with help from two brothers in Gosford who gave him work, and later the premier, Henry Parkes, made him the colony's first Inspector of Forests.",
+"But the job meant constant travel, and Kendall wasn't strong enough. He died of tuberculosis in 1882, aged forty-three."],
+fact:"In 1926 he was picked as one of the first five Australians to be painted for a planned national portrait gallery, alongside Joseph Banks and Charles Sturt."},
+{n:12,title:"Ethel Pedley",sub:"Author of Dot and the Kangaroo",years:"1859–1898",lat:-33.9079812,lng:151.2691431,
+look:"Pedley's grave in the Anglican section. Her companion, the musician Emmeline Woolley, is buried close by.",
+script:[
+"Ethel Pedley was a musician and violin teacher, and she wrote one of Australia's first great children's books: Dot and the Kangaroo.",
+"It's about a little girl who gets lost in the bush and is helped home by a kangaroo who has lost her own joey. Along the way, the animals tell Dot what humans are doing to them.",
+"That makes it one of the earliest Australian environmental stories. Pedley dedicated it to the children of Australia, hoping they'd care about native animals before hunting wiped them out.",
+"She never saw it published. She died of cancer in 1898, aged thirty-nine, and the book came out the following year.",
+"She also persuaded London's top music schools to extend their exams to the colonies, and became their only representative in New South Wales.",
+"After her death, her brother set up a travelling scholarship for music students in her name."],
+fact:"Dot and the Kangaroo was turned into an animated film in 1977, almost eighty years after it was published."},
+{n:13,title:"Dorothea Mackellar",sub:"Poet",years:"1885–1968",lat:-33.9081097,lng:151.2693164,
+look:"The Mackellar family vault, right near the cliff edge, looking out over the ocean. Last stop.",
+script:[
+"You'll know at least one line by Dorothea Mackellar, even if you don't know her name: I love a sunburnt country.",
+"She wrote the poem My Country at nineteen, while she was homesick in England. Surrounded by neat green fields, she worked out that she missed the harsh, dry, flooding, burning version of home.",
+"It was first published in 1908 and became one of the best-known poems in the country.",
+"She came from a wealthy, well-connected Sydney family, spoke four European languages, and travelled all over Europe. But her poetry came from time spent on her brothers' farms near Gunnedah.",
+"She stopped writing in later life and died in 1968, two weeks after being awarded an OBE. Her ashes are in the family vault here, facing the sea.",
+"That's the end of the tour. Before you go, take a minute to stand here and look out. Plenty of people buried here spent their lives trying to describe a view like this one."],
+fact:"At her funeral they read her own favourite poem, Colour, which includes a verse about long smooth beaches edged with foam."}
+];
+
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let state={view:"home",i:0,visited:new Set(store.get("wv-visited",[])),rate:store.get("wv-rate",1),pos:null,geoMsg:"",playing:false,sent:0};
+
+/* ---------- map ---------- */
+function mapSVG(active){
+  const lats=STOPS.map(s=>s.lat),lngs=STOPS.map(s=>s.lng);
+  const minLa=Math.min(...lats),maxLa=Math.max(...lats),minLo=Math.min(...lngs),maxLo=Math.max(...lngs);
+  const k=Math.cos(minLa*Math.PI/180);
+  const W=520,pad=34,spanX=(maxLo-minLo)*k,spanY=maxLa-minLa;
+  const sc=(W-pad*2-60)/spanX, H=Math.round(spanY*sc+pad*2);
+  const P=(la,lo)=>[pad+(lo-minLo)*k*sc,pad+(maxLa-la)*sc];
+  const pts=STOPS.map(s=>P(s.lat,s.lng));
+  let path=pts.map((p,j)=>(j?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  let dots=pts.map((p,j)=>{const s=STOPS[j],v=state.visited.has(s.n),a=active===j;
+    return `<g class="pt" data-i="${j}" style="cursor:pointer"><circle cx="${p[0]}" cy="${p[1]}" r="${a?14:11}" fill="${v?'var(--done)':a?'var(--sea)':'var(--surface)'}" stroke="${v?'var(--done)':a?'var(--sea)':'var(--stone)'}" stroke-width="1.5"/>
+    <text x="${p[0]}" y="${p[1]+4}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="${v||a?'var(--surface)':'var(--stone)'}">${s.n}</text></g>`}).join("");
+  let me="";
+  if(state.pos){const [x,y]=P(state.pos.lat,state.pos.lng); if(x>-20&&x<W+20&&y>-20&&y<H+20) me=`<circle cx="${x}" cy="${y}" r="16" fill="var(--sea)" opacity=".18"/><circle cx="${x}" cy="${y}" r="6" fill="var(--sea)" stroke="var(--surface)" stroke-width="2"/>`;}
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Route map of the 13 stops">
+    <defs><linearGradient id="sea" x1="0" x2="1"><stop offset="0" stop-color="var(--sea)" stop-opacity="0"/><stop offset="1" stop-color="var(--sea)" stop-opacity=".22"/></linearGradient></defs>
+    <rect x="${W-70}" y="0" width="70" height="${H}" fill="url(#sea)"/>
+    <text x="${W-14}" y="${H/2}" text-anchor="middle" transform="rotate(90 ${W-14} ${H/2})" font-family="JetBrains Mono,monospace" font-size="10" letter-spacing="3" fill="var(--sea)">PACIFIC OCEAN</text>
+    <text x="${pad-10}" y="16" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--muted)">N ↑</text>
+    <path d="${path}" fill="none" stroke="var(--stone)" stroke-width="1.5" stroke-dasharray="4 5" opacity=".7"/>
+    ${dots}${me}</svg>`;
+}
+function dist(a,b){const R=6371e3,t=Math.PI/180,dLa=(b.lat-a.lat)*t,dLo=(b.lng-a.lng)*t;
+  const h=Math.sin(dLa/2)**2+Math.cos(a.lat*t)*Math.cos(b.lat*t)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function startGeo(){
+  if(!navigator.geolocation){state.geoMsg="Location isn't available on this device.";return}
+  try{navigator.geolocation.watchPosition(p=>{state.pos={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy};state.geoMsg="";refreshGeo()},
+    ()=>{state.geoMsg="Location is off. The map and stories still work without it.";refreshGeo()},{enableHighAccuracy:true,maximumAge:5000,timeout:20000})}
+  catch(e){state.geoMsg="Location isn't available here."}
+}
+function refreshGeo(){
+  const m=$("#mapbox"); if(m) m.innerHTML=mapSVG(state.view==="stop"?state.i:-1), bindMap();
+  const g=$("#geo"); if(g) g.textContent=geoLine();
+}
+function geoLine(){
+  if(!state.pos) return state.geoMsg||"Finding your location…";
+  const s=STOPS[state.view==="stop"?state.i:nextIdx()]; const d=dist(state.pos,s);
+  if(d>1500) return "You're not at the cemetery yet. Stop "+s.n+" is "+(d/1000).toFixed(1)+" km away.";
+  return d<20?"You're at stop "+s.n+".":"Stop "+s.n+" is about "+Math.round(d/5)*5+" m away.";
+}
+function nextIdx(){const j=STOPS.findIndex(s=>!state.visited.has(s.n));return j<0?0:j}
+function bindMap(){document.querySelectorAll(".pt").forEach(g=>g.onclick=()=>openStop(+g.dataset.i))}
+
+/* ---------- speech ---------- */
+const synth=window.speechSynthesis; let voice=null;
+function pickVoice(){if(!synth)return;const v=synth.getVoices();
+  voice=v.find(x=>/en-AU/i.test(x.lang)&&/Karen|Lee|Catherine/i.test(x.name))||v.find(x=>/en-AU/i.test(x.lang))||v.find(x=>/en-GB/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null}
+if(synth){pickVoice();synth.onvoiceschanged=pickVoice}
+let token=0;
+function speakFrom(idx){
+  if(!synth) return;
+  const my=++token; synth.cancel();
+  const lines=STOPS[state.i].script;
+  const go=j=>{
+    if(my!==token) return;
+    if(j>=lines.length){state.playing=false;state.sent=0;markVisited();paintPlayer();highlight(-1);return}
+    state.sent=j;highlight(j);paintPlayer();
+    const u=new SpeechSynthesisUtterance(lines[j]); if(voice)u.voice=voice; u.lang=voice?voice.lang:"en-AU"; u.rate=state.rate; u.pitch=1;
+    u.onend=()=>{if(my===token&&state.playing) setTimeout(()=>go(j+1),250)};
+    u.onerror=()=>{if(my===token){state.playing=false;paintPlayer()}};
+    synth.speak(u);
+  };
+  state.playing=true; go(idx);
+}
+function stopSpeech(){token++; if(synth) synth.cancel(); state.playing=false}
+function highlight(j){document.querySelectorAll(".script span").forEach((s,k)=>s.classList.toggle("now",k===j));
+  const el=document.querySelector(".script span.now"); if(el&&!matchMedia("(prefers-reduced-motion:reduce)").matches) el.scrollIntoView({block:"center",behavior:"smooth"})}
+function markVisited(){state.visited.add(STOPS[state.i].n);store.set("wv-visited",[...state.visited]);
+  const p=$(".prog"); if(p) p.innerHTML=progHTML()}
+
+/* ---------- views ---------- */
+const ICON={play:'<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',pause:'<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+prev:'<svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM9.5 12 18 6v12z"/></svg>',next:'<svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg>'};
+function progHTML(){return STOPS.map((s,j)=>`<i class="${j===state.i?'on':state.visited.has(s.n)?'v':''}"></i>`).join("")}
+
+function home(){
+  stopSpeech(); state.view="home";
+  const done=state.visited.size, nx=nextIdx();
+  $("#app").innerHTML=`<div class="wrap stack">
+    <header class="hero">
+      <span class="eyebrow">Audio walk · Bronte cliffs</span>
+      <h1>Waverley Cemetery Walk</h1>
+      <p>Thirteen graves, thirteen stories. Poets, a rock star, a rebel, an aviator, a Titanic survivor and a boy whose story was wrong for a hundred years.</p>
+      <div class="facts"><div><b>13</b><span>stops</span></div><div><b>~30</b><span>minutes</span></div><div><b class="mono">${done}/13</b><span>heard</span></div></div>
+    </header>
+    <div class="row"><button class="btn" id="go">${done?"Continue at stop "+STOPS[nx].n:"Start the tour"}</button>${done?'<button class="btn ghost" id="reset">Start over</button>':""}</div>
+    <section class="map"><div id="mapbox">${mapSVG(-1)}</div><div class="mapfoot"><span id="geo">${geoLine()}</span><span class="mono">−33.908, 151.266</span></div></section>
+    <ol class="list">${STOPS.map((s,j)=>`<li class="${state.visited.has(s.n)?'done':''}"><button data-i="${j}">
+      <span class="num">${s.n}</span><span style="min-width:0"><span class="t">${s.title}</span><br><span class="s">${s.sub}</span></span><span class="d mono">${s.years||""}</span></button></li>`).join("")}</ol>
+    <div class="note"><b>Before you start</b>Stay on the paths and off the graves, and keep it quiet near anyone visiting family. Sound plays through your phone speaker or headphones. Check the cemetery's gate hours before you go.</div>
+    <details><summary>About this tour</summary><p style="font-size:14px;color:var(--muted)">Narration is written for this app from the stories on the Hello Bondi Waverley Cemetery Walk (hellobondi.com.au), the official Waverley Council tourism site. Stop locations come from that walk's map. Grave positions on the map are approximate, so use the "Look for" note at each stop.</p></details>
+  </div>`;
+  $("#go").onclick=()=>openStop(nx);
+  const r=$("#reset"); if(r) r.onclick=()=>{state.visited.clear();store.set("wv-visited",[]);home()};
+  document.querySelectorAll(".list button").forEach(b=>b.onclick=()=>openStop(+b.dataset.i));
+  bindMap(); window.scrollTo(0,0);
+}
+
+function openStop(j){
+  stopSpeech(); state.view="stop"; state.i=j; state.sent=0;
+  const s=STOPS[j];
+  $("#app").innerHTML=`<div class="wrap stack">
+    <div class="top"><button class="back" id="back">← All stops</button><div class="prog">${progHTML()}</div></div>
+    <div class="stophead"><span class="eyebrow">Stop ${s.n} of 13 · ${s.sub}</span><h2>${s.title}</h2>${s.years?`<span class="years">${s.years}</span>`:""}</div>
+    <div class="look"><div class="eyebrow">Look for</div>${s.look}</div>
+    <div class="dist" id="geo">${geoLine()}</div>
+    <div class="script"><p>${s.script.map(t=>`<span>${t}</span>`).join(" ")}</p></div>
+    <div class="fact"><div class="eyebrow">One more thing</div>${s.fact}</div>
+    <section class="map"><div id="mapbox">${mapSVG(j)}</div></section>
+  </div>
+  <div class="player"><div class="pin">
+    <div class="bar"><i id="bar"></i></div>
+    <div class="ctrls">
+      <button class="ic" id="prev" aria-label="Previous stop" ${j===0?"disabled":""}>${ICON.prev}</button>
+      <div class="meta"><b>${s.n}. ${s.title}</b><br><span id="pmeta"></span></div>
+      <select class="speed" id="rate" aria-label="Speed">${[0.9,1,1.15,1.3].map(r=>`<option value="${r}" ${r==state.rate?"selected":""}>${r}×</option>`).join("")}</select>
+      <button class="play" id="play" aria-label="Play">${ICON.play}</button>
+      <button class="ic" id="next" aria-label="Next stop">${ICON.next}</button>
+    </div>
+    ${synth?"":'<div class="voicewarn">This browser can\'t read aloud, so read along instead.</div>'}
+  </div></div>`;
+  $("#back").onclick=home;
+  $("#prev").onclick=()=>openStop(j-1);
+  $("#next").onclick=()=>{markVisited(); j<12?openStop(j+1):finish()};
+  $("#play").onclick=()=>{ if(state.playing){stopSpeech();paintPlayer()} else speakFrom(state.sent) };
+  $("#rate").onchange=e=>{state.rate=+e.target.value;store.set("wv-rate",state.rate);if(state.playing)speakFrom(state.sent)};
+  document.querySelectorAll(".script span").forEach((el,k)=>el.onclick=()=>speakFrom(k));
+  bindMap(); paintPlayer(); window.scrollTo(0,0);
+}
+function paintPlayer(){
+  const p=$("#play"); if(!p) return;
+  p.innerHTML=state.playing?ICON.pause:ICON.play; p.setAttribute("aria-label",state.playing?"Pause":"Play");
+  const n=STOPS[state.i].script.length; $("#bar").style.width=(state.playing||state.sent?((state.sent+(state.playing?.5:0))/n*100):0)+"%";
+  $("#pmeta").textContent=state.playing?"Playing":state.visited.has(STOPS[state.i].n)?"Heard · tap play to replay":"Tap play, or tap any line";
+}
+function finish(){
+  stopSpeech(); state.view="end";
+  $("#app").innerHTML=`<div class="wrap stack" style="padding-top:40px">
+    <span class="eyebrow">Tour complete · ${state.visited.size}/13 heard</span>
+    <h1>That's the walk.</h1>
+    <p style="color:var(--muted);max-width:60ch">From here the coastal path heads north to Bronte and Bondi, or south to Clovelly and Coogee. Either way, you've just walked past a good chunk of Australian history.</p>
+    <div class="row"><button class="btn" id="h">Back to all stops</button></div></div>`;
+  $("#h").onclick=home;
+}
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&state.playing){stopSpeech();paintPlayer()}});
+startGeo(); home();
+</script>

@@ -2,97 +2,98 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Waverley">
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: one-column pocket guide. Route map + stop list at home; each stop is a full screen with a docked player at the bottom. */
+/* Layout: a deck of 14 cards (cover + 13 stops) swiped left/right; a fixed bar at the bottom for prev / jump-to-number / next. */
 :root{
-  --bg:#eef1f1; --surface:#ffffff; --ink:#13232b; --muted:#5b6b72; --line:#d3dcdf;
+  --bg:#e7ecec; --card:#ffffff; --ink:#13232b; --muted:#5b6b72; --line:#d3dcdf;
   --sea:#0e6e85; --sea-soft:#d6e9ee; --stone:#a8692f; --stone-soft:#f1e3d4; --done:#2f7d55;
   --display:"Cinzel","Trajan Pro",Georgia,serif;
   --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0b161b; --surface:#12222a; --ink:#e4ecee; --muted:#93a6ad; --line:#24363e;
+  --bg:#0b161b; --card:#12222a; --ink:#e4ecee; --muted:#93a6ad; --line:#24363e;
   --sea:#5cb8cf; --sea-soft:#14323c; --stone:#e0a066; --stone-soft:#33261b; --done:#6cc493; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0b161b; --surface:#12222a; --ink:#e4ecee; --muted:#93a6ad; --line:#24363e;
+  --bg:#0b161b; --card:#12222a; --ink:#e4ecee; --muted:#93a6ad; --line:#24363e;
   --sea:#5cb8cf; --sea-soft:#14323c; --stone:#e0a066; --stone-soft:#33261b; --done:#6cc493; color-scheme:dark}
 
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
-.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 140px}
-h1,h2{font-family:var(--display);font-weight:700;letter-spacing:.04em;text-wrap:balance;margin:0}
-h1{font-size:clamp(30px,8vw,40px);line-height:1.1}
-h2{font-size:24px;line-height:1.2}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,a:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
-.btn{border:0;border-radius:999px;padding:12px 20px;font-weight:600;background:var(--sea);color:var(--surface)}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-.stack{display:flex;flex-direction:column;gap:16px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 
-/* home */
-.hero{display:flex;flex-direction:column;gap:10px;padding-block:8px 4px}
-.hero p{margin:0;color:var(--muted);max-width:60ch}
-.facts{display:flex;gap:18px;flex-wrap:wrap}
-.facts div{display:flex;flex-direction:column}
-.facts b{font-family:var(--mono);font-size:20px;font-weight:500}
-.facts span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.map{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.map svg{display:block;width:100%;height:auto}
-.mapfoot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
-.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.list li{border-bottom:1px solid var(--line)}
-.list button{width:100%;display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;background:none;border:0;padding:12px 2px;text-align:left}
-.num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:13px;border:1.5px solid var(--stone);color:var(--stone)}
-.done .num{background:var(--done);border-color:var(--done);color:var(--surface)}
-.list .t{font-weight:600;min-width:0}
-.list .s{font-size:13px;color:var(--muted)}
-.list .d{font-size:12px;color:var(--muted)}
-.note{background:var(--stone-soft);border-radius:12px;padding:14px 16px;font-size:14px}
-.note b{display:block;margin-bottom:4px}
-details summary{cursor:pointer;color:var(--muted);font-size:14px}
+.app{height:100%;display:flex;flex-direction:column}
+.viewport{flex:1;min-height:0;overflow:hidden;position:relative}
+.track{display:flex;height:100%;transition:transform .32s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.track.drag{transition:none}
+.slot{flex:0 0 100%;height:100%;padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.card{max-width:560px;height:100%;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.inner{padding:24px 22px 32px;display:flex;flex-direction:column;gap:18px}
 
-/* stop */
-.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.back{background:none;border:0;padding:8px 0;color:var(--muted);font-size:14px}
-.prog{display:flex;gap:3px;flex:1;max-width:220px}
-.prog i{flex:1;height:4px;border-radius:2px;background:var(--line)}
-.prog i.on{background:var(--sea)}.prog i.v{background:var(--done)}
-.stophead{display:flex;flex-direction:column;gap:6px;padding-top:6px}
-.years{font-family:var(--mono);color:var(--stone);font-size:14px}
+/* stop card */
+.head{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.big{font-family:var(--display);font-weight:700;font-size:56px;line-height:1;color:var(--stone);min-width:1.1ch;text-align:center}
+.head h2{font-family:var(--display);font-weight:700;font-size:23px;line-height:1.2;letter-spacing:.03em;margin:2px 0;text-wrap:balance}
+.years{font-family:var(--mono);font-size:14px;color:var(--stone);font-variant-numeric:tabular-nums}
 .look{background:var(--sea-soft);border-radius:12px;padding:12px 16px;font-size:15px}
 .look .eyebrow{color:var(--sea);margin-bottom:2px}
-.dist{font-size:13px;color:var(--muted)}
-.script p{margin:0 0 14px;font-size:17px;line-height:1.65;max-width:62ch}
-.script span{transition:background .2s,color .2s;border-radius:3px}
-.script span.now{background:var(--sea-soft);color:var(--ink);box-shadow:0 0 0 2px var(--sea-soft)}
+.story p{margin:0 0 14px;font-size:17px;line-height:1.65;max-width:62ch}
+.story p:last-child{margin-bottom:0}
 .fact{border-left:3px solid var(--stone);padding:4px 0 4px 14px;font-size:15px}
 .fact .eyebrow{color:var(--stone)}
+.read{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--done)}
 
-/* player */
-.player{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
-  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));z-index:5}
-.pin{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
-.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--sea);width:0;transition:width .3s}
-.ctrls{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:10px;align-items:center}
-.ic{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
-.ic:disabled{opacity:.35;cursor:default}
-.play{width:56px;height:56px;border-radius:50%;border:0;background:var(--sea);color:var(--surface);display:grid;place-items:center}
-.ic svg,.play svg{width:20px;height:20px;fill:currentColor}
-.meta{min-width:0;font-size:13px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.meta b{color:var(--ink);font-weight:600}
-.speed{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;font-family:var(--mono);font-size:13px}
-.voicewarn{font-size:12px;color:var(--muted)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* cover */
+.cover h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,8vw,40px);line-height:1.1;letter-spacing:.04em;margin:4px 0 0;text-wrap:balance}
+.cover p{margin:0;color:var(--muted);max-width:60ch}
+.how{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.how li{display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:15px}
+.how b{font-family:var(--mono);color:var(--stone);font-weight:500}
+.note{background:var(--stone-soft);border-radius:12px;padding:14px 16px;font-size:14px}
+.note b{display:block;margin-bottom:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px}
+.grid button{aspect-ratio:1;max-width:100%;border-radius:12px;border:1.5px solid var(--stone);background:transparent;color:var(--stone);font-family:var(--mono);font-size:17px}
+.grid button.seen{background:var(--done);border-color:var(--done);color:var(--card)}
+.grid button.cur{background:var(--sea);border-color:var(--sea);color:var(--card)}
+.src{font-size:12px;color:var(--muted)}
+.start{border:0;border-radius:999px;padding:14px 22px;font-weight:600;background:var(--sea);color:var(--card);align-self:flex-start}
+
+/* bottom bar */
+.bar{background:var(--card);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.barin{max-width:560px;margin:0 auto;display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center}
+.nav{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:grid;place-items:center}
+.nav:disabled{opacity:.3;cursor:default}
+.nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.jump{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px}
+.jump .lbl{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+.dots{display:flex;gap:3px;width:100%;max-width:240px}
+.dots i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.dots i.seen{background:var(--done)}.dots i.cur{background:var(--sea)}
+
+/* jump sheet */
+.sheet{position:fixed;inset:0;background:rgba(10,20,25,.45);display:flex;align-items:flex-end;z-index:10}
+.panel{width:100%;max-width:560px;margin:0 auto;background:var(--card);border-radius:18px 18px 0 0;padding:20px max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.panel h3{margin:0;font-family:var(--display);font-size:19px;letter-spacing:.03em}
+.close{align-self:flex-end;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-size:14px}
+@media (prefers-reduced-motion:reduce){.track{transition:none}}
 </style>
 
-<div id="app"></div>
+<div class="app">
+  <div class="viewport" id="vp"><div class="track" id="track"></div></div>
+  <div class="bar"><div class="barin">
+    <button class="nav" id="prev" aria-label="Previous card"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="jump" id="jump" aria-label="Jump to a stop"><span class="lbl" id="lbl"></span><span class="dots" id="dots"></span></button>
+    <button class="nav" id="next" aria-label="Next card"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div></div>
+</div>
+<div class="sheet" id="sheet" hidden><div class="panel">
+  <h3>Go to stop</h3>
+  <div class="grid" id="sheetgrid"></div>
+  <button class="close" id="close">Close</button>
+</div></div>
 
 <script>
 const STOPS=[
@@ -103,7 +104,7 @@ script:[
 "This land belongs to the Bidjigal, Birrabirragal and Gadigal people, who lived along this coast for thousands of years before anyone drew a grid of graves across it.",
 "The cemetery opened in the 1870s. Since then it has filled up with poets, rock stars, rebels, inventors, a Titanic survivor and one small boy whose story turned out to be completely wrong for more than a century.",
 "The walk takes about half an hour. Take it slowly, stick to the paths, and keep your voice down if you pass anyone visiting a grave. People still come here to grieve.",
-"When you're ready, tap next and we'll start with how this place came to be."],
+"When you're ready, swipe on and we'll start with how this place came to be."],
 fact:"The Hello Bondi walk this tour follows originally began as the opening leg of Bondi Festival's coastal walk, which ran all the way to Bondi Pavilion."},
 {n:2,title:"History of the cemetery",sub:"Over 100,000 burials",lat:-33.9072399,lng:151.2641923,
 look:"The front gates. They're a memorial to Waverley locals who died in the two World Wars.",
@@ -226,156 +227,67 @@ script:[
 "That's the end of the tour. Before you go, take a minute to stand here and look out. Plenty of people buried here spent their lives trying to describe a view like this one."],
 fact:"At her funeral they read her own favourite poem, Colour, which includes a verse about long smooth beaches edged with foam."}
 ];
-
-const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let state={view:"home",i:0,visited:new Set(store.get("wv-visited",[])),rate:store.get("wv-rate",1),pos:null,geoMsg:"",playing:false,sent:0};
+const seen=new Set(store.get("wc-seen",[]));
+let cur=Math.min(store.get("wc-cur",0),STOPS.length);
+const N=STOPS.length+1; // cover + stops
+const $=id=>document.getElementById(id);
+const track=$("track");
 
-/* ---------- map ---------- */
-function mapSVG(active){
-  const lats=STOPS.map(s=>s.lat),lngs=STOPS.map(s=>s.lng);
-  const minLa=Math.min(...lats),maxLa=Math.max(...lats),minLo=Math.min(...lngs),maxLo=Math.max(...lngs);
-  const k=Math.cos(minLa*Math.PI/180);
-  const W=520,pad=34,spanX=(maxLo-minLo)*k,spanY=maxLa-minLa;
-  const sc=(W-pad*2-60)/spanX, H=Math.round(spanY*sc+pad*2);
-  const P=(la,lo)=>[pad+(lo-minLo)*k*sc,pad+(maxLa-la)*sc];
-  const pts=STOPS.map(s=>P(s.lat,s.lng));
-  let path=pts.map((p,j)=>(j?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
-  let dots=pts.map((p,j)=>{const s=STOPS[j],v=state.visited.has(s.n),a=active===j;
-    return `<g class="pt" data-i="${j}" style="cursor:pointer"><circle cx="${p[0]}" cy="${p[1]}" r="${a?14:11}" fill="${v?'var(--done)':a?'var(--sea)':'var(--surface)'}" stroke="${v?'var(--done)':a?'var(--sea)':'var(--stone)'}" stroke-width="1.5"/>
-    <text x="${p[0]}" y="${p[1]+4}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="${v||a?'var(--surface)':'var(--stone)'}">${s.n}</text></g>`}).join("");
-  let me="";
-  if(state.pos){const [x,y]=P(state.pos.lat,state.pos.lng); if(x>-20&&x<W+20&&y>-20&&y<H+20) me=`<circle cx="${x}" cy="${y}" r="16" fill="var(--sea)" opacity=".18"/><circle cx="${x}" cy="${y}" r="6" fill="var(--sea)" stroke="var(--surface)" stroke-width="2"/>`;}
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Route map of the 13 stops">
-    <defs><linearGradient id="sea" x1="0" x2="1"><stop offset="0" stop-color="var(--sea)" stop-opacity="0"/><stop offset="1" stop-color="var(--sea)" stop-opacity=".22"/></linearGradient></defs>
-    <rect x="${W-70}" y="0" width="70" height="${H}" fill="url(#sea)"/>
-    <text x="${W-14}" y="${H/2}" text-anchor="middle" transform="rotate(90 ${W-14} ${H/2})" font-family="JetBrains Mono,monospace" font-size="10" letter-spacing="3" fill="var(--sea)">PACIFIC OCEAN</text>
-    <text x="${pad-10}" y="16" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--muted)">N ↑</text>
-    <path d="${path}" fill="none" stroke="var(--stone)" stroke-width="1.5" stroke-dasharray="4 5" opacity=".7"/>
-    ${dots}${me}</svg>`;
-}
-function dist(a,b){const R=6371e3,t=Math.PI/180,dLa=(b.lat-a.lat)*t,dLo=(b.lng-a.lng)*t;
-  const h=Math.sin(dLa/2)**2+Math.cos(a.lat*t)*Math.cos(b.lat*t)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
-function startGeo(){
-  if(!navigator.geolocation){state.geoMsg="Location isn't available on this device.";return}
-  try{navigator.geolocation.watchPosition(p=>{state.pos={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy};state.geoMsg="";refreshGeo()},
-    ()=>{state.geoMsg="Location is off. The map and stories still work without it.";refreshGeo()},{enableHighAccuracy:true,maximumAge:5000,timeout:20000})}
-  catch(e){state.geoMsg="Location isn't available here."}
-}
-function refreshGeo(){
-  const m=$("#mapbox"); if(m) m.innerHTML=mapSVG(state.view==="stop"?state.i:-1), bindMap();
-  const g=$("#geo"); if(g) g.textContent=geoLine();
-}
-function geoLine(){
-  if(!state.pos) return state.geoMsg||"Finding your location…";
-  const s=STOPS[state.view==="stop"?state.i:nextIdx()]; const d=dist(state.pos,s);
-  if(d>1500) return "You're not at the cemetery yet. Stop "+s.n+" is "+(d/1000).toFixed(1)+" km away.";
-  return d<20?"You're at stop "+s.n+".":"Stop "+s.n+" is about "+Math.round(d/5)*5+" m away.";
-}
-function nextIdx(){const j=STOPS.findIndex(s=>!state.visited.has(s.n));return j<0?0:j}
-function bindMap(){document.querySelectorAll(".pt").forEach(g=>g.onclick=()=>openStop(+g.dataset.i))}
+function gridHTML(){return STOPS.map((s,j)=>`<button data-go="${j+1}" class="${cur===j+1?'cur':seen.has(s.n)?'seen':''}" aria-label="Stop ${s.n}: ${s.title}">${s.n}</button>`).join("")}
 
-/* ---------- speech ---------- */
-const synth=window.speechSynthesis; let voice=null;
-function pickVoice(){if(!synth)return;const v=synth.getVoices();
-  voice=v.find(x=>/en-AU/i.test(x.lang)&&/Karen|Lee|Catherine/i.test(x.name))||v.find(x=>/en-AU/i.test(x.lang))||v.find(x=>/en-GB/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null}
-if(synth){pickVoice();synth.onvoiceschanged=pickVoice}
-let token=0;
-function speakFrom(idx){
-  if(!synth) return;
-  const my=++token; synth.cancel();
-  const lines=STOPS[state.i].script;
-  const go=j=>{
-    if(my!==token) return;
-    if(j>=lines.length){state.playing=false;state.sent=0;markVisited();paintPlayer();highlight(-1);return}
-    state.sent=j;highlight(j);paintPlayer();
-    const u=new SpeechSynthesisUtterance(lines[j]); if(voice)u.voice=voice; u.lang=voice?voice.lang:"en-AU"; u.rate=state.rate; u.pitch=1;
-    u.onend=()=>{if(my===token&&state.playing) setTimeout(()=>go(j+1),250)};
-    u.onerror=()=>{if(my===token){state.playing=false;paintPlayer()}};
-    synth.speak(u);
-  };
-  state.playing=true; go(idx);
-}
-function stopSpeech(){token++; if(synth) synth.cancel(); state.playing=false}
-function highlight(j){document.querySelectorAll(".script span").forEach((s,k)=>s.classList.toggle("now",k===j));
-  const el=document.querySelector(".script span.now"); if(el&&!matchMedia("(prefers-reduced-motion:reduce)").matches) el.scrollIntoView({block:"center",behavior:"smooth"})}
-function markVisited(){state.visited.add(STOPS[state.i].n);store.set("wv-visited",[...state.visited]);
-  const p=$(".prog"); if(p) p.innerHTML=progHTML()}
+function coverHTML(){return `<div class="inner cover">
+  <span class="eyebrow">Self-guided walk · Bronte cliffs</span>
+  <h1>Waverley Cemetery Walk</h1>
+  <p>Thirteen graves, thirteen stories. Poets, a rock star, a rebel, an aviator, a Titanic survivor, and a boy whose story was wrong for a hundred years.</p>
+  <ul class="how">
+    <li><b>1</b><span>Use the paper map to walk to the next numbered stop.</span></li>
+    <li><b>2</b><span>When you get there, open the card with the same number.</span></li>
+    <li><b>3</b><span>Find what the card tells you to look for, then read the story.</span></li>
+  </ul>
+  <button class="start" data-go="1">Start at stop 1</button>
+  <div><div class="eyebrow" style="margin-bottom:8px">Or jump to a stop</div><div class="grid" id="covergrid">${gridHTML()}</div></div>
+  <div class="note"><b>Before you start</b>Stay on the paths and off the graves, and keep it quiet near anyone visiting family. Allow about 30 minutes.</div>
+  <p class="src">Stories are adapted from the Hello Bondi Waverley Cemetery Walk (hellobondi.com.au), Waverley Council's official tourism site.</p>
+</div>`}
 
-/* ---------- views ---------- */
-const ICON={play:'<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',pause:'<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
-prev:'<svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM9.5 12 18 6v12z"/></svg>',next:'<svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg>'};
-function progHTML(){return STOPS.map((s,j)=>`<i class="${j===state.i?'on':state.visited.has(s.n)?'v':''}"></i>`).join("")}
+function stopHTML(s){return `<div class="inner">
+  <div class="head"><div class="big">${s.n}</div><div><span class="eyebrow">${s.sub}</span><h2>${s.title}</h2>${s.years?`<span class="years">${s.years}</span>`:""}</div></div>
+  <div class="look"><div class="eyebrow">Look for</div>${s.look}</div>
+  <div class="story">${s.script.map(t=>`<p>${t}</p>`).join("")}</div>
+  <div class="fact"><div class="eyebrow">One more thing</div>${s.fact}</div>
+  <div class="read">${s.n<STOPS.length?`Next: stop ${s.n+1}, ${STOPS[s.n].title}. Check your map.`:"That's the end of the walk. Thanks for coming."}</div>
+</div>`}
 
-function home(){
-  stopSpeech(); state.view="home";
-  const done=state.visited.size, nx=nextIdx();
-  $("#app").innerHTML=`<div class="wrap stack">
-    <header class="hero">
-      <span class="eyebrow">Audio walk · Bronte cliffs</span>
-      <h1>Waverley Cemetery Walk</h1>
-      <p>Thirteen graves, thirteen stories. Poets, a rock star, a rebel, an aviator, a Titanic survivor and a boy whose story was wrong for a hundred years.</p>
-      <div class="facts"><div><b>13</b><span>stops</span></div><div><b>~30</b><span>minutes</span></div><div><b class="mono">${done}/13</b><span>heard</span></div></div>
-    </header>
-    <div class="row"><button class="btn" id="go">${done?"Continue at stop "+STOPS[nx].n:"Start the tour"}</button>${done?'<button class="btn ghost" id="reset">Start over</button>':""}</div>
-    <section class="map"><div id="mapbox">${mapSVG(-1)}</div><div class="mapfoot"><span id="geo">${geoLine()}</span><span class="mono">−33.908, 151.266</span></div></section>
-    <ol class="list">${STOPS.map((s,j)=>`<li class="${state.visited.has(s.n)?'done':''}"><button data-i="${j}">
-      <span class="num">${s.n}</span><span style="min-width:0"><span class="t">${s.title}</span><br><span class="s">${s.sub}</span></span><span class="d mono">${s.years||""}</span></button></li>`).join("")}</ol>
-    <div class="note"><b>Before you start</b>Stay on the paths and off the graves, and keep it quiet near anyone visiting family. Sound plays through your phone speaker or headphones. Check the cemetery's gate hours before you go.</div>
-    <details><summary>About this tour</summary><p style="font-size:14px;color:var(--muted)">Narration is written for this app from the stories on the Hello Bondi Waverley Cemetery Walk (hellobondi.com.au), the official Waverley Council tourism site. Stop locations come from that walk's map. Grave positions on the map are approximate, so use the "Look for" note at each stop.</p></details>
-  </div>`;
-  $("#go").onclick=()=>openStop(nx);
-  const r=$("#reset"); if(r) r.onclick=()=>{state.visited.clear();store.set("wv-visited",[]);home()};
-  document.querySelectorAll(".list button").forEach(b=>b.onclick=()=>openStop(+b.dataset.i));
-  bindMap(); window.scrollTo(0,0);
-}
+track.innerHTML=`<div class="slot"><div class="card">${coverHTML()}</div></div>`+STOPS.map(s=>`<div class="slot"><div class="card">${stopHTML(s)}</div></div>`).join("");
 
-function openStop(j){
-  stopSpeech(); state.view="stop"; state.i=j; state.sent=0;
-  const s=STOPS[j];
-  $("#app").innerHTML=`<div class="wrap stack">
-    <div class="top"><button class="back" id="back">← All stops</button><div class="prog">${progHTML()}</div></div>
-    <div class="stophead"><span class="eyebrow">Stop ${s.n} of 13 · ${s.sub}</span><h2>${s.title}</h2>${s.years?`<span class="years">${s.years}</span>`:""}</div>
-    <div class="look"><div class="eyebrow">Look for</div>${s.look}</div>
-    <div class="dist" id="geo">${geoLine()}</div>
-    <div class="script"><p>${s.script.map(t=>`<span>${t}</span>`).join(" ")}</p></div>
-    <div class="fact"><div class="eyebrow">One more thing</div>${s.fact}</div>
-    <section class="map"><div id="mapbox">${mapSVG(j)}</div></section>
-  </div>
-  <div class="player"><div class="pin">
-    <div class="bar"><i id="bar"></i></div>
-    <div class="ctrls">
-      <button class="ic" id="prev" aria-label="Previous stop" ${j===0?"disabled":""}>${ICON.prev}</button>
-      <div class="meta"><b>${s.n}. ${s.title}</b><br><span id="pmeta"></span></div>
-      <select class="speed" id="rate" aria-label="Speed">${[0.9,1,1.15,1.3].map(r=>`<option value="${r}" ${r==state.rate?"selected":""}>${r}×</option>`).join("")}</select>
-      <button class="play" id="play" aria-label="Play">${ICON.play}</button>
-      <button class="ic" id="next" aria-label="Next stop">${ICON.next}</button>
-    </div>
-    ${synth?"":'<div class="voicewarn">This browser can\'t read aloud, so read along instead.</div>'}
-  </div></div>`;
-  $("#back").onclick=home;
-  $("#prev").onclick=()=>openStop(j-1);
-  $("#next").onclick=()=>{markVisited(); j<12?openStop(j+1):finish()};
-  $("#play").onclick=()=>{ if(state.playing){stopSpeech();paintPlayer()} else speakFrom(state.sent) };
-  $("#rate").onchange=e=>{state.rate=+e.target.value;store.set("wv-rate",state.rate);if(state.playing)speakFrom(state.sent)};
-  document.querySelectorAll(".script span").forEach((el,k)=>el.onclick=()=>speakFrom(k));
-  bindMap(); paintPlayer(); window.scrollTo(0,0);
+function go(i,anim=true){
+  cur=Math.max(0,Math.min(N-1,i));
+  if(cur>0){seen.add(STOPS[cur-1].n);store.set("wc-seen",[...seen])}
+  store.set("wc-cur",cur);
+  track.classList.toggle("drag",!anim);
+  track.style.transform=`translateX(${-cur*100}%)`;
+  $("prev").disabled=cur===0; $("next").disabled=cur===N-1;
+  $("lbl").textContent=cur===0?"Start · tap to jump":`Stop ${cur} of ${STOPS.length}`;
+  $("dots").innerHTML=STOPS.map((s,j)=>`<i class="${cur===j+1?'cur':seen.has(s.n)?'seen':''}"></i>`).join("");
+  const cg=$("covergrid"); if(cg) cg.innerHTML=gridHTML();
+  const card=track.children[cur].querySelector(".card"); if(card) card.scrollTop=0;
 }
-function paintPlayer(){
-  const p=$("#play"); if(!p) return;
-  p.innerHTML=state.playing?ICON.pause:ICON.play; p.setAttribute("aria-label",state.playing?"Pause":"Play");
-  const n=STOPS[state.i].script.length; $("#bar").style.width=(state.playing||state.sent?((state.sent+(state.playing?.5:0))/n*100):0)+"%";
-  $("#pmeta").textContent=state.playing?"Playing":state.visited.has(STOPS[state.i].n)?"Heard · tap play to replay":"Tap play, or tap any line";
-}
-function finish(){
-  stopSpeech(); state.view="end";
-  $("#app").innerHTML=`<div class="wrap stack" style="padding-top:40px">
-    <span class="eyebrow">Tour complete · ${state.visited.size}/13 heard</span>
-    <h1>That's the walk.</h1>
-    <p style="color:var(--muted);max-width:60ch">From here the coastal path heads north to Bronte and Bondi, or south to Clovelly and Coogee. Either way, you've just walked past a good chunk of Australian history.</p>
-    <div class="row"><button class="btn" id="h">Back to all stops</button></div></div>`;
-  $("#h").onclick=home;
-}
-document.addEventListener("visibilitychange",()=>{if(document.hidden&&state.playing){stopSpeech();paintPlayer()}});
-startGeo(); home();
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b){$("sheet").hidden=true;go(+b.dataset.go)}});
+$("prev").onclick=()=>go(cur-1); $("next").onclick=()=>go(cur+1);
+$("jump").onclick=()=>{$("sheetgrid").innerHTML=gridHTML();$("sheet").hidden=false};
+$("close").onclick=()=>$("sheet").hidden=true;
+$("sheet").onclick=e=>{if(e.target.id==="sheet")$("sheet").hidden=true};
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight")go(cur+1);if(e.key==="ArrowLeft")go(cur-1);if(e.key==="Escape")$("sheet").hidden=true});
+
+/* swipe: horizontal drags move the deck, vertical drags scroll the card */
+let sx=0,sy=0,dx=0,lock=null;const vp=$("vp");
+vp.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;lock=null},{passive:true});
+vp.addEventListener("touchmove",e=>{const x=e.touches[0].clientX-sx,y=e.touches[0].clientY-sy;
+  if(lock===null&&(Math.abs(x)>8||Math.abs(y)>8)) lock=Math.abs(x)>Math.abs(y)?"x":"y";
+  if(lock==="x"){e.preventDefault();dx=x;track.classList.add("drag");
+    const edge=(cur===0&&dx>0)||(cur===N-1&&dx<0)?.3:1;
+    track.style.transform=`translateX(calc(${-cur*100}% + ${dx*edge}px))`}},{passive:false});
+vp.addEventListener("touchend",()=>{if(lock==="x"){const w=vp.clientWidth;go(dx<-w*.18?cur+1:dx>w*.18?cur-1:cur)}lock=null});
+go(cur,false);
 </script>
